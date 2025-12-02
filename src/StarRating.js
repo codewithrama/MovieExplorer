@@ -48,6 +48,7 @@ export default function StarRating({
       <div style={starStyle}>
         {Array.from({ length: maxRating }, (_, i) => (
           <Star
+            disabledstyling={classname}
             key={i}
             onRate={() => handleRate(i + 1)}
             onHoverIn={() => setTempRating(i + 1)}
@@ -67,7 +68,15 @@ export default function StarRating({
   );
 }
 
-function Star({ onRate, full, onHoverIn, onHoverOut, color, size }) {
+function Star({
+  onRate,
+  full,
+  onHoverIn,
+  onHoverOut,
+  color,
+  size,
+  disabledstyling,
+}) {
   const starStyling = {
     width: `${size}px`,
     height: `${size}px`,
@@ -81,6 +90,7 @@ function Star({ onRate, full, onHoverIn, onHoverOut, color, size }) {
       onClick={onRate}
       onMouseEnter={onHoverIn}
       onMouseLeave={onHoverOut}
+      className={disabledstyling}
     >
       {full ? (
         <svg

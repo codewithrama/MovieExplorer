@@ -114,6 +114,9 @@ export default function App() {
     setWatched((watched) => [...watched, newMovie]);
   }
 
+  function handleDeleteWatchedMovies(id) {
+    setWatched((watched) => watched.filter((wa) => wa.imdbID !== id));
+  }
   return (
     <>
       <NavBar>
@@ -146,7 +149,10 @@ export default function App() {
           ) : (
             <>
               <Summary watched={watched} />
-              <WatchedMovieList watched={watched} />
+              <WatchedMovieList
+                watched={watched}
+                handleDelete={handleDeleteWatchedMovies}
+              />
             </>
           )}
         </Box>
@@ -264,10 +270,7 @@ function MovieDetails({ handleMovieClose, id, handleWatchedMovies, watched }) {
     fetchDetails();
   }, [id]);
 
-  console.log("Watched List", watched);
-  console.log("Watched List Movie ID ", watched);
-
-  const [isWatched] = watched.map((movie) => movie.imdbID === id);
+  const isWatched = watched.filter((movie) => movie.imdbID === id).length > 0;
   // console.log("watched Status : ", isWatched);
 
   const currentMovie = watched.filter((mov) => mov.imdbID === id);
@@ -285,7 +288,6 @@ function MovieDetails({ handleMovieClose, id, handleWatchedMovies, watched }) {
         movies.Runtime === "N/A"
           ? Number(0)
           : Number(movies.Runtime.split(" ").at(0)),
-      isWatched: true,
     };
     handleWatchedMovies(newMovie);
     handleMovieClose();
@@ -332,7 +334,8 @@ function MovieDetails({ handleMovieClose, id, handleWatchedMovies, watched }) {
               <StarRating
                 maxRating={10}
                 size={24}
-                defaultRating={currentMovie.userRating}
+                defaultRating={currentMovie[0].userRating}
+                classname="disabled"
               />
             </div>
             <button className="btn-add" disabled>
@@ -383,17 +386,21 @@ function Summary({ watched }) {
   );
 }
 
-function WatchedMovieList({ watched }) {
+function WatchedMovieList({ watched, handleDelete }) {
   return (
     <ul className="list">
       {watched.map((movie) => (
-        <WatchedMovie movie={movie} key={movie.imdbID} />
+        <WatchedMovie
+          movie={movie}
+          key={movie.imdbID}
+          handleDelete={handleDelete}
+        />
       ))}
     </ul>
   );
 }
 
-function WatchedMovie({ movie }) {
+function WatchedMovie({ movie, handleDelete }) {
   return (
     <li key={movie.imdbID}>
       <img src={movie.Poster} alt={`${movie.Title} poster`} />
@@ -412,6 +419,9 @@ function WatchedMovie({ movie }) {
           <span>{movie.runtime} min</span>
         </p>
       </div>
+      <button className="btn-delete" onClick={() => handleDelete(movie.imdbID)}>
+        X
+      </button>
     </li>
   );
 }
