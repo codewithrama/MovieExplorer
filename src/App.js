@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Loader from "./Loader";
 import StarRating from "./StarRating";
 
@@ -58,7 +58,10 @@ const API_key = "45170ebe";
 
 export default function App() {
   const [movies, setMovies] = useState([]);
-  const [watched, setWatched] = useState([]);
+  const [watched, setWatched] = useState(function () {
+    const storedMovie = localStorage.getItem("watched");
+    return storedMovie ? JSON.parse(storedMovie) : [];
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
@@ -116,6 +119,13 @@ export default function App() {
       };
     },
     [query]
+  );
+
+  useEffect(
+    function () {
+      localStorage.setItem("watched", JSON.stringify(watched));
+    },
+    [watched]
   );
 
   function handleMovieListClick(id) {
@@ -195,6 +205,28 @@ function Logo() {
 }
 
 function SearchBar({ setQuery, query }) {
+  const inputRef = useRef(null); //using UseRef
+
+  useEffect(
+    function () {
+      function callBack(e) {
+        if (document.activeElement === inputRef.current) {
+          return;
+        }
+        if (e.code === "Enter") {
+          inputRef.current.focus();
+          setQuery("");
+        }
+      }
+      document.addEventListener("keydown", callBack);
+
+      return function cleanUp() {
+        document.removeEventListener("keydown", callBack);
+      };
+    },
+    [setQuery]
+  );
+
   return (
     <input
       className="search"
@@ -202,6 +234,7 @@ function SearchBar({ setQuery, query }) {
       placeholder="Search movies.. Min 3 Characters"
       value={query}
       onChange={(e) => setQuery(e.target.value)}
+      ref={inputRef} // connecting ref reference to ref Prop
     />
   );
 }
