@@ -16,7 +16,7 @@ export function useMovie(query) {
       async function fetchData() {
         try {
           const data = await fetch(
-            `http://www.omdbapi.com/?apikey=${API_key}&s=${query}`,
+            `https://www.omdbapi.com/?apikey=${API_key}&s=${query}`,
             { signal: controller.signal }
           );
 
