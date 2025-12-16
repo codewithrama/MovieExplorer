@@ -3,6 +3,7 @@ import Loader from "./Loader";
 import StarRating from "./StarRating.jsx";
 import { useMovie } from "./Hooks/useMovie";
 import { useLocalStorage } from "./Hooks/useLocalstorage.jsx";
+import { useKey } from "./Hooks/useKey.jsx";
 
 // const tempMovieData = [
 //   {
@@ -167,25 +168,13 @@ function Logo() {
 function SearchBar({ setQuery, query }) {
   const inputRef = useRef(null); //using UseRef
 
-  useEffect(
-    function () {
-      function callBack(e) {
-        if (document.activeElement === inputRef.current) {
-          return;
-        }
-        if (e.code === "Enter") {
-          inputRef.current.focus();
-          setQuery("");
-        }
-      }
-      document.addEventListener("keydown", callBack);
-
-      return function cleanUp() {
-        document.removeEventListener("keydown", callBack);
-      };
-    },
-    [setQuery]
-  );
+  useKey("Enter", function () {
+    if (document.activeElement === inputRef.current) {
+      return;
+    }
+    inputRef.current.focus();
+    setQuery("");
+  });
 
   return (
     <input
@@ -292,21 +281,7 @@ function MovieDetails({ handleMovieClose, id, handleWatchedMovies, watched }) {
 
   //Key Press Effect
 
-  useEffect(
-    function () {
-      function KeyListner(e) {
-        if (e.code === "Escape") {
-          handleMovieClose();
-        }
-      }
-      document.addEventListener("keydown", KeyListner);
-
-      return function () {
-        document.removeEventListener("keydown", KeyListner);
-      };
-    },
-    [handleMovieClose]
-  );
+  useKey("Escape", handleMovieClose);
 
   const isWatched = watched.filter((movie) => movie.imdbID === id).length > 0;
   // console.log("watched Status : ", isWatched);
